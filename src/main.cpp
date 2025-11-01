@@ -18,6 +18,7 @@
 #include <sdk/os/debug.h>
 #include <sdk/os/gui.h>
 #include <sdk/os/lcd.h>
+#include <sdk/os/input.h>
 #include <stdexcept>
 
 void do_override() {
@@ -82,7 +83,59 @@ void do_override() {
 }
 
 int main() {
-  do_override();
+  bool firstKeyPressed = false;
+  bool secondKeyPressed = false;
+  bool thirdKeyPressed = false;
+
+  {
+      struct Input_Event event;
+      while (true) {
+          GetInput(&event, 0xFFFFFFFF, 0x10);
+
+          if (event.type == EVENT_KEY && event.data.key.direction == KEY_PRESSED) {
+
+              if (!firstKeyPressed) {
+                  if (event.data.key.keyCode == KEYCODE_4) {
+                      firstKeyPressed = true;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
+
+              else if (!secondKeyPressed) {
+                  if (event.data.key.keyCode == KEYCODE_3) {
+                      secondKeyPressed = true;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
+
+              else if (!thirdKeyPressed) {
+                  if (event.data.key.keyCode == KEYCODE_1) {
+                      thirdKeyPressed = true;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
+
+              else {
+                  if (event.data.key.keyCode == KEYCODE_9) {
+                      break;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
+          }
+      }
+  }
 
   std::unique_ptr<Executable> choosen;
   {
@@ -99,9 +152,11 @@ int main() {
 
   calcExit();
   choosen->load();
-  auto ret = choosen->execute();
+
+  int execResult = static_cast<int>(choosen->execute());
+
   choosen->unload();
   calcInit();
 
-  return ret;
+  return execResult;
 }

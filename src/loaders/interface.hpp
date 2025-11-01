@@ -71,7 +71,7 @@ struct discover_impl<
     int findHandle = 0;
     File_FindInfo findInfo{};
     int ret;
-    constexpr auto prefix = "\\fls0\\";
+    constexpr auto prefix = "\\fls0\\Picture\\c2p\\Images\\";
     constexpr auto prefix_len = std::char_traits<char>::length(prefix);
     constexpr auto pattern = ([prefix, prefix_len] {
       std::array<char_const16_t, prefix_len + T::ext.size + 1> arr{};

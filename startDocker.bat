@@ -1,0 +1,1 @@
+docker run -it --rm -v "C:\Users\Jannik\Documents\Projekte\Hollyhock\Hollyhock Launcher\yal:/hollyhock_launcher" --name hollyhock_launcher hollyhock_launcher

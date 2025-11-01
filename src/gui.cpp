@@ -48,7 +48,7 @@ do_gui(std::forward_list<std::unique_ptr<Executable>> &executable_list) {
   init.g.show = gTrue;
   init.g.height = widget_height;
 
-  init.text = "Yet Another Launcher";
+  init.text = "Launch HollyHock-3";
   init.g.width -= widget_height + border;
   gwinLabelCreate(nullptr, &init);
   init.g.x += init.g.width + border;

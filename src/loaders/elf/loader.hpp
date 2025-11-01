@@ -3,7 +3,7 @@
 #include <elf.h>
 #include <memory>
 
-class ELFLoader : public FileBasedExecutable<".hh3"> {
+class ELFLoader : public FileBasedExecutable<".c2p"> {
 public:
   using FileBasedExecutable::FileBasedExecutable;
   void load() override;
