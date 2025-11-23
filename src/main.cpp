@@ -19,6 +19,8 @@
 #include <sdk/os/gui.h>
 #include <sdk/os/lcd.h>
 #include <stdexcept>
+#include <sdk/os/input.h>
+#include <fstream>
 
 void do_override() {
   const auto guard_len = std::strlen(safe_guard);
@@ -81,9 +83,46 @@ void do_override() {
   return;
 }
 
+void init_pwd() {
+  std::ofstream pwdi("\\fls0\\pwd.txt");
+  if (! pwdi) {
+    throw std::runtime_error("Failed to create pwd.txt (Password File)");
+  }
+  pwdi << 4 << std::endl;
+  pwdi << 3 << std::endl;
+  pwdi << 1 << std::endl;
+  pwdi << 9 << std::endl;
+  pwdi.close();
+}
+
+bool read_pwd(v1, v2, v3, v4) {
+  std::ifstream pwd("\\fls0\\pwd.txt");
+  if (! pwd) {
+    init_pwd();
+    pwd.open("\\fls0\\pwd.txt");
+  }
+  if (pwd >> v1, pwd >> v2, pwd >> v3, pwd >> v4) {
+    pwd.close();
+    return true;
+  }
+
+}
+
 int main() {
-  
-  do_override();
+ int val_1, val_2, val_3, val_4;
+ read_pwd(val_1, val_2, val_3, val_4);
+ struct Input_Event event;
+ if(event.type == EVENT_KEY) {
+  if (event.data.key.key_code == val_1) {
+    if (event.data.key.key_code == val_2) {
+      if (event.data.key.key_code == val_3) {
+        if (event.data.key.key_code == val_4) {
+        do_override();
+        }
+      }
+    }
+  }
+ }
 
   std::unique_ptr<Executable> choosen;
   {
