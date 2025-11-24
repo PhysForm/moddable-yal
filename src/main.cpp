@@ -1,3 +1,19 @@
+extern "C" {
+
+// Minimal stub for _swprintf so that newlib's strftime can link.
+// This stub does NOTHING useful but satisfies the linker.
+// If strftime tries to format wide strings, it will simply write nothing and return -1.
+int _swprintf(wchar_t *ws, const wchar_t *fmt, ...) {
+    (void)ws;
+    (void)fmt;
+    return -1;
+}
+
+} // extern "C"
+
+
+
+
 // for setenv from <stdlib.h>
 #define _POSIX_C_SOURCE 200112L
 #include "addresses.h"
@@ -21,19 +37,6 @@
 #include <stdexcept>
 #include <sdk/os/input.h>
 #include <fstream>
-
-extern "C" {
-
-// Minimal stub for _swprintf so that newlib's strftime can link.
-// This stub does NOTHING useful but satisfies the linker.
-// If strftime tries to format wide strings, it will simply write nothing and return -1.
-int _swprintf(wchar_t *ws, const wchar_t *fmt, ...) {
-    (void)ws;
-    (void)fmt;
-    return -1;
-}
-
-} // extern "C"
 
 
 
