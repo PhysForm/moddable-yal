@@ -95,36 +95,28 @@ void init_pwd() {
   pwdi.close();
 }
 
-bool read_pwd(int &v1, int &v2, int &v3, int &v4) {
+bool read_pwd(v1, v2, v3, v4) {
   std::ifstream pwd("\\fls0\\pwd.txt");
-  if (!pwd) {
-    // attempt to create default file, then reopen
+  if (! pwd) {
     init_pwd();
     pwd.open("\\fls0\\pwd.txt");
-    if (!pwd) {
-      return false;
-    }
   }
-
-  // Use chained extraction; this returns the stream so we can test it
-  if (pwd >> v1 >> v2 >> v3 >> v4) {
+  if (pwd >> v1, pwd >> v2, pwd >> v3, pwd >> v4) {
     pwd.close();
     return true;
-  } else {
-    pwd.close();
-    return false;
   }
+
 }
 
 int main() {
  int val_1, val_2, val_3, val_4;
  read_pwd(val_1, val_2, val_3, val_4);
  struct Input_Event event;
- if(event.type == Input_EventType::Input_KeyEventType) {
-  if (event.data.key.keyCode == val_1) {
-    if (event.data.key.keyCode == val_2) {
-      if (event.data.key.keyCode == val_3) {
-        if (event.data.key.keyCode == val_4) {
+ if(event.type == EVENT_KEY) {
+  if (event.data.key.key_code == val_1) {
+    if (event.data.key.key_code == val_2) {
+      if (event.data.key.key_code == val_3) {
+        if (event.data.key.key_code == val_4) {
         do_override();
         }
       }
