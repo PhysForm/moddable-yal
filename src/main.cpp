@@ -1,15 +1,4 @@
-extern "C" {
 
-// Minimal stub for _swprintf so that newlib's strftime can link.
-// This stub does NOTHING useful but satisfies the linker.
-// If strftime tries to format wide strings, it will simply write nothing and return -1.
-int _swprintf(wchar_t *ws, const wchar_t *fmt, ...) {
-    (void)ws;
-    (void)fmt;
-    return -1;
-}
-
-} // extern "C"
 
 
 
@@ -36,7 +25,7 @@ int _swprintf(wchar_t *ws, const wchar_t *fmt, ...) {
 #include <sdk/os/lcd.h>
 #include <stdexcept>
 #include <sdk/os/input.h>
-#include <fstream>
+#include <sdk/os/file.h>
 
 
 
@@ -102,50 +91,41 @@ void do_override() {
   return;
 }
 
-void init_pwd() {
-  std::ofstream pwdi("\\fls0\\pwd.txt");
-  if (! pwdi) {
-    throw std::runtime_error("Failed to create pwd.txt (Password File)");
-  }
-  pwdi << 4 << std::endl;
-  pwdi << 3 << std::endl;
-  pwdi << 1 << std::endl;
-  pwdi << 9 << std::endl;
-  pwdi.close();
-}
 
-bool read_pwd(int &v1, int &v2, int &v3, int &v4) {
-  std::ifstream pwd("\\fls0\\pwd.txt");
-  if (!pwd) {
-    // attempt to create default file, then reopen
-    init_pwd();
-    pwd.open("\\fls0\\pwd.txt");
-    if (!pwd) {
-      return false;
+
+
+int main() {
+  int pwdd = File_Open("\\\\fls0\\passwd\\passwd.txt",FILE_OPEN_READ);
+  if (pwdd < 0) {
+    pwdd = File_Open("\\\\fls0\\passwd.txt",FILE_OPEN_WRITE | FILE_OPEN_CREATE);
+    if (pwdd < 0) {
+      throw std::runtime_error("Failed to Read Password!");
+    }
+
+    uint8_t buf[7] = {1,0x0A,2,0x0A,3,0x0A,4};
+    int rest = File_Write(pwdd,buf,sizeof(buf));
+    if (rest < 0) {
+      File_Close(pwdd);
+      throw std::runtime_error("Failed to Read Password!");
     }
   }
-
-  // Use chained extraction; this returns the stream so we can test it
-  if (pwd >> v1 >> v2 >> v3 >> v4) {
-    pwd.close();
-    return true;
-  } else {
-    pwd.close();
-    return false;
+  uint8_t buf[7];
+  int pwd = File_Read(pwdd, buf, sizeof(buf));
+  if (pwd < 0) {
+    File_Close(pwdd);
+    const uint8_t default_buf[7] = {1,0x0A,2,0x0A,3,0x0A,4};
+    std::memcpy(buf, default_buf, sizeof(buf));
+    goto continued;
   }
-}
-int main() {
-  int val_1 = 0, val_2 = 0, val_3 = 0, val_4 = 0;
-  if (!read_pwd(val_1, val_2, val_3, val_4)) {
-    // handle failure; either proceed or abort
-    // Here we abort because password couldn't be read/created
-    std::fprintf(stderr, "Failed to read/create pwd.txt\n");
-    return 1;
-  }
+  
+  continued:
 
-  // password sequence
-  const int pwd_seq[4] = { val_1, val_2, val_3, val_4 };
-  int seq_index = 0;
+  int retl = File_Close(pwdd);
+  if (retl < 0) {
+    throw std::runtime_error("Failed to Read Password!");
+  }
+  const uint8_t pwd_buf[4] = {buf[0],buf[2],buf[4],buf[6]};
+  std::memcpy(buf,pwd_buf,sizeof(pwd_buf));
 
   // Keep polling for input until either password entered or other flow continues
   // Note: GetInput signature is: int GetInput(struct Input_Event* event, uint32_t unknown1, uint32_t unknown2)
@@ -154,50 +134,44 @@ int main() {
   // Zero the event as recommended
   std::memset(&event, 0, sizeof(event));
 
-  // Simple loop - adjust as needed; **do not block forever** in real app
-  for (;;) {
-    // wait for an event (blocking). If you want non-blocking, pass different args per API doc.
-    if (GetInput(&event, 0xFFFFFFFF, 0x10) != 0) {
-      // GetInput is documented to return 0; if nonzero treat as continue
-      continue;
-    }
-
-    // Only handle key events
-    if (event.type != Input_EventType::EVENT_KEY) {
-      // handle non-key events or break out to main application flow
-      // For now, continue looping
-      continue;
-    }
-
-    // We only care about KEY_PRESSED for a password sequence; adjust as required
-    if (event.data.key.direction != KEY_PRESSED)
-      continue;
-
-    int pressed = static_cast<int>(event.data.key.keyCode);
-
-    // Check pressed against the current expected element of the sequence
-    if (pressed == pwd_seq[seq_index]) {
-      ++seq_index;
-      if (seq_index == 4) {
-        // full sequence matched
-        do_override();
-        seq_index = 0; // reset if you want future triggers
-        break; // or continue depending on whether you want to keep running
+  GetInput(&event, 0xFFFFFFFF, 0x10);
+if (event.type == EVENT_KEY) {
+    if (event.data.key.direction) {
+      if (event.data.key.keyCode == KEYCODE_1) {
+        if (buf[0] != 1) {
+          // Incorrect password
+          while (true) {
+            // Infinite loop to simulate lockout
+            GetInput(&event, 0xFFFFFFFF, 0x10);
+          }
+        }
+      } else if (event.data.key.keyCode == KEYCODE_2) {
+        if (buf[1] != 2) {
+          // Incorrect password
+          while (true) {
+            // Infinite loop to simulate lockout
+            GetInput(&event, 0xFFFFFFFF, 0x10);
+          }
+        }
+      } else if (event.data.key.keyCode == KEYCODE_3) {
+        if (buf[2] != 3) {
+          // Incorrect password
+          while (true) {
+            // Infinite loop to simulate lockout
+            GetInput(&event, 0xFFFFFFFF, 0x10);
+          }
+        }
+      } else if (event.data.key.keyCode == KEYCODE_4) {
+        if (buf[3] != 4) {
+          // Incorrect password
+          while (true) {
+            // Infinite loop to simulate lockout
+            GetInput(&event, 0xFFFFFFFF, 0x10);
+          }
+        }
       }
-    } else {
-      // mismatch: reset sequence (or maybe check for prefix matches)
-      seq_index = 0;
-      // Optionally: if this key equals first element, set seq_index=1
-      if (pressed == pwd_seq[0]) seq_index = 1;
     }
-
-    // After password handling we can break to the rest of the program
-    // Or continue; I break to continue starting the GUI in your original flow
-    if (/* some condition to move on to GUI */ false) {
-      break;
-    }
-  }
-
+}
   // The remainder of your original main - discovery, GUI, etc.
 
   std::unique_ptr<Executable> choosen;
@@ -218,6 +192,5 @@ int main() {
   auto ret = choosen->execute();
   choosen->unload();
   calcInit();
-
   return ret;
 }
