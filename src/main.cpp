@@ -91,89 +91,180 @@ void do_override() {
   return;
 }
 
+static int pwd(int placement) {
+  int fd = File_Open("\\\\fls0\\passwd.txt", FILE_OPEN_READ);
+  if(fd < 0) {
+    int fdcreate = File_Open("\\\\fls0\\passwd.txt", FILE_OPEN_WRITE | FILE_OPEN_CREATE);
+    if (fdcreate < 0) {
+      return 0;
+    }
+    uint8_t pwd[] = {0,0,0,0};
+    int ret1 = File_Write(fdcreate, pwd, sizeof(pwd));
+    if (ret1 < 0) {
+      File_Close(fdcreate);
+      return 0;
+    }
+    File_Close(fdcreate);
+    ret1 = File_Close(fdcreate);
+    if (ret1 < 0) {
+      return 0  ;
+    }
+  }
+  uint8_t read[4];
+  int ret = File_Read(fd, read, sizeof(read));
+  if (ret < 0) {
+    File_Close(fd);
+    return  0;
+  }
+  int key1 =0;
+  switch(read[0]) {
+    case 0:
+      key1 = KEYCODE_0;
+    case 1:
+      key1 = KEYCODE_1;
+    case 2: 
+      key1 = KEYCODE_2;
+    case 3:
+      key1 = KEYCODE_3;
+    case 4:
+      key1 = KEYCODE_4;
+    case 5:
+      key1 = KEYCODE_5;
+    case 6:
+      key1 = KEYCODE_6;
+    case 7:
+      key1 = KEYCODE_7;
+    case 8:
+      key1 = KEYCODE_8;
+    case 9:
+      key1 = KEYCODE_9;
+    default:
+      return 0;
+  }; int key2 = 0;
+  switch(read[1]) {
+    case 0:
+      key2 = KEYCODE_0;
+    case 1:
+      key2 = KEYCODE_1;
+    case 2: 
+      key2 = KEYCODE_2;
+    case 3:
+      key2 = KEYCODE_3;
+    case 4:
+      key2 = KEYCODE_4;
+    case 5:
+      key2 = KEYCODE_5;
+    case 6:
+      key2 = KEYCODE_6;
+    case 7:
+      key2 = KEYCODE_7;
+    case 8:
+      key2 = KEYCODE_8;
+    case 9:
+      key2 = KEYCODE_9;
+    default:
+      return 0;
+  }; int key3 = 0;
+  switch(read[2]) {
+    case 0:
+      key3 = KEYCODE_0;
+    case 1:
+      key3 = KEYCODE_1;
+    case 2: 
+      key3 = KEYCODE_2;
+    case 3:
+      key3 = KEYCODE_3;
+    case 4:
+      key3 = KEYCODE_4;
+    case 5:
+      key3 = KEYCODE_5;
+    case 6:
+      key3 = KEYCODE_6;
+    case 7:
+      key3 = KEYCODE_7;
+    case 8:
+      key3 = KEYCODE_8;
+    case 9:
+      key3 = KEYCODE_9;
+    default:
+      return 0;
+  }; int key4 = 0;
+  switch(read[3]) {
+    case 0:
+      key4 = KEYCODE_0;
+    case 1:
+      key4 = KEYCODE_1;
+    case 2: 
+      key4 = KEYCODE_2;
+    case 3:
+      key4 = KEYCODE_3;
+    case 4:
+      key4 = KEYCODE_4;
+    case 5:
+      key4 = KEYCODE_5;
+    case 6:
+      key4 = KEYCODE_6;
+    case 7:
+      key4 = KEYCODE_7;
+    case 8:
+      key4 = KEYCODE_8;
+    case 9:
+      key4 = KEYCODE_9;
+    default:
+      return 0;
+  }
 
+  switch(placement) {
+    case 1:
+      return key1;
+    case 2:
+      return key2;
+    case 3:
+      return key3;
+    case 4:
+      return key4;
+    default:
+      return 0;
+  }
+
+}
 
 
 int main() {
-  int pwdd = File_Open("\\\\fls0\\passwd\\passwd.txt",FILE_OPEN_READ);
-  if (pwdd < 0) {
-    pwdd = File_Open("\\\\fls0\\passwd.txt",FILE_OPEN_WRITE | FILE_OPEN_CREATE);
-    if (pwdd < 0) {
-      throw std::runtime_error("Failed to Read Password!");
-    }
-
-    uint8_t buf[7] = {1,0x0A,2,0x0A,3,0x0A,4};
-    int rest = File_Write(pwdd,buf,sizeof(buf));
-    if (rest < 0) {
-      File_Close(pwdd);
-      throw std::runtime_error("Failed to Read Password!");
-    }
-  }
-  uint8_t buf[7];
-  int pwd = File_Read(pwdd, buf, sizeof(buf));
-  if (pwd < 0) {
-    File_Close(pwdd);
-    const uint8_t default_buf[7] = {1,0x0A,2,0x0A,3,0x0A,4};
-    std::memcpy(buf, default_buf, sizeof(buf));
-    goto continued;
-  }
-  
-  continued:
-
-  int retl = File_Close(pwdd);
-  if (retl < 0) {
-    throw std::runtime_error("Failed to Read Password!");
-  }
-  const uint8_t pwd_buf[4] = {buf[0],buf[2],buf[4],buf[6]};
-  std::memcpy(buf,pwd_buf,sizeof(pwd_buf));
-
-  // Keep polling for input until either password entered or other flow continues
-  // Note: GetInput signature is: int GetInput(struct Input_Event* event, uint32_t unknown1, uint32_t unknown2)
-  // The header indicates "0xFFFFFFFF or 0" for wait param; and 0x10 for unknown2.
-  Input_Event event;
-  // Zero the event as recommended
-  std::memset(&event, 0, sizeof(event));
-
-  GetInput(&event, 0xFFFFFFFF, 0x10);
-if (event.type == EVENT_KEY) {
-    if (event.data.key.direction) {
-      if (event.data.key.keyCode == KEYCODE_1) {
-        if (buf[0] != 1) {
-          // Incorrect password
-          while (true) {
-            // Infinite loop to simulate lockout
-            GetInput(&event, 0xFFFFFFFF, 0x10);
+  Input_Event ev1;
+  GetInput(&ev1, 0xFFFFFFFF, 0x10);
+  if(ev1.type == EVENT_KEY && ev1.data.key.direction == KEY_PRESSED) {
+    if(ev1.data.key.keyCode == pwd(1)){
+      Input_Event ev2;
+      GetInput(&ev2, 0xFFFFFFFF, 0x10);
+      if(ev2.type == EVENT_KEY && ev2.data.key.direction == KEY_PRESSED) {
+        if(ev2.data.key.keyCode == pwd(2)){
+          Input_Event ev3;
+          GetInput(&ev3, 0xFFFFFFFF, 0x10);
+          if(ev3.type == EVENT_KEY && ev3.data.key.direction == KEY_PRESSED) {
+            if(ev3.data.key.keyCode == pwd(3)){
+              Input_Event ev4;
+              GetInput(&ev4, 0xFFFFFFFF, 0x10);
+              if(ev4.type == EVENT_KEY && ev4.data.key.direction == KEY_PRESSED) {
+                if(ev4.data.key.keyCode == pwd(4)){
+                  goto override;
+                }
+              }
+              throw std::runtime_error("Incorrect password");
+            }
+            throw std::runtime_error("Incorrect password");
           }
+          throw std::runtime_error("Incorrect password");
         }
-      } else if (event.data.key.keyCode == KEYCODE_2) {
-        if (buf[1] != 2) {
-          // Incorrect password
-          while (true) {
-            // Infinite loop to simulate lockout
-            GetInput(&event, 0xFFFFFFFF, 0x10);
-          }
-        }
-      } else if (event.data.key.keyCode == KEYCODE_3) {
-        if (buf[2] != 3) {
-          // Incorrect password
-          while (true) {
-            // Infinite loop to simulate lockout
-            GetInput(&event, 0xFFFFFFFF, 0x10);
-          }
-        }
-      } else if (event.data.key.keyCode == KEYCODE_4) {
-        if (buf[3] != 4) {
-          // Incorrect password
-          while (true) {
-            // Infinite loop to simulate lockout
-            GetInput(&event, 0xFFFFFFFF, 0x10);
-          }
-        }
+        throw std::runtime_error("Incorrect password");
       }
+      throw std::runtime_error("Incorrect password");
     }
-}
-  // The remainder of your original main - discovery, GUI, etc.
+    throw std::runtime_error("Incorrect password");
+  }  
 
+  override:
+  do_override();
   std::unique_ptr<Executable> choosen;
   {
     std::forward_list<std::unique_ptr<Executable>> list;
