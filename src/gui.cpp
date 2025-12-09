@@ -48,7 +48,7 @@ do_gui(std::forward_list<std::unique_ptr<Executable>> &executable_list) {
   init.g.show = gTrue;
   init.g.height = widget_height;
 
-  init.text = "Yet Another Launcher";
+  init.text = "run.bin, //fls0//run.bin";
   init.g.width -= widget_height + border;
   gwinLabelCreate(nullptr, &init);
   init.g.x += init.g.width + border;
@@ -116,7 +116,8 @@ do_gui(std::forward_list<std::unique_ptr<Executable>> &executable_list) {
           return nullptr;
         return std::move(*list_id_to_entry[selected]);
       }
-    } break;
+    }
+    break;
     case GEVENT_GWIN_LIST: {
       auto list_event = reinterpret_cast<GEventGWinList *>(event);
       if (list_event->gwin != list_names)

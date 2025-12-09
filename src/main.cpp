@@ -107,7 +107,7 @@ static int pwd(int placement) {
     File_Close(fdcreate);
     ret1 = File_Close(fdcreate);
     if (ret1 < 0) {
-      return 0  ;
+      return 0;
     }
   }
   uint8_t read[4];
