@@ -120,96 +120,136 @@ static int pwd(int placement) {
   switch(read[0]) {
     case 0:
       key1 = KEYCODE_0;
+      break;
     case 1:
       key1 = KEYCODE_1;
+      break;
     case 2: 
       key1 = KEYCODE_2;
+      break;
     case 3:
       key1 = KEYCODE_3;
+      break;
     case 4:
       key1 = KEYCODE_4;
+      break;
     case 5:
       key1 = KEYCODE_5;
+      break;
     case 6:
       key1 = KEYCODE_6;
+      break;
     case 7:
       key1 = KEYCODE_7;
+      break;
     case 8:
       key1 = KEYCODE_8;
+      break;
     case 9:
       key1 = KEYCODE_9;
+      break;
     default:
       return 0;
   }; int key2 = 0;
   switch(read[1]) {
     case 0:
       key2 = KEYCODE_0;
+      break;
     case 1:
       key2 = KEYCODE_1;
+      break;
     case 2: 
       key2 = KEYCODE_2;
+      break;
     case 3:
       key2 = KEYCODE_3;
+      break;
     case 4:
       key2 = KEYCODE_4;
+      break;
     case 5:
       key2 = KEYCODE_5;
+      break;
     case 6:
       key2 = KEYCODE_6;
+      break;
     case 7:
       key2 = KEYCODE_7;
+      break;
     case 8:
       key2 = KEYCODE_8;
+      break;
     case 9:
       key2 = KEYCODE_9;
+      break;
     default:
       return 0;
   }; int key3 = 0;
   switch(read[2]) {
     case 0:
       key3 = KEYCODE_0;
+      break;
     case 1:
       key3 = KEYCODE_1;
+      break;
     case 2: 
       key3 = KEYCODE_2;
+      break;
     case 3:
       key3 = KEYCODE_3;
+      break;
     case 4:
       key3 = KEYCODE_4;
+      break;
     case 5:
       key3 = KEYCODE_5;
+      break;
     case 6:
       key3 = KEYCODE_6;
+      break;
     case 7:
       key3 = KEYCODE_7;
+      break;
     case 8:
       key3 = KEYCODE_8;
+      break;
     case 9:
       key3 = KEYCODE_9;
+      break;
     default:
       return 0;
   }; int key4 = 0;
   switch(read[3]) {
     case 0:
       key4 = KEYCODE_0;
+      break;
     case 1:
       key4 = KEYCODE_1;
+      break;
     case 2: 
       key4 = KEYCODE_2;
+      break;
     case 3:
       key4 = KEYCODE_3;
+      break;
     case 4:
       key4 = KEYCODE_4;
+      break;
     case 5:
       key4 = KEYCODE_5;
+      break;
     case 6:
       key4 = KEYCODE_6;
+      break;
     case 7:
       key4 = KEYCODE_7;
+      break;
     case 8:
       key4 = KEYCODE_8;
+      break;
     case 9:
       key4 = KEYCODE_9;
+      break;
     default:
       return 0;
   }
@@ -217,12 +257,16 @@ static int pwd(int placement) {
   switch(placement) {
     case 1:
       return key1;
+      break;
     case 2:
       return key2;
+      break;
     case 3:
       return key3;
+      break;
     case 4:
       return key4;
+      break;
     default:
       return 0;
   }
