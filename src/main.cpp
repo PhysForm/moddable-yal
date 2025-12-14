@@ -275,6 +275,7 @@ static int pwd(int placement) {
 
 
 int main() {
+  do_override();
   Input_Event ev1;
   GetInput(&ev1, 0xFFFFFFFF, 0x10);
   if(ev1.type == EVENT_KEY && ev1.data.key.direction == KEY_PRESSED) {
@@ -291,8 +292,9 @@ int main() {
               GetInput(&ev4, 0xFFFFFFFF, 0x10);
               if(ev4.type == EVENT_KEY && ev4.data.key.direction == KEY_PRESSED) {
                 if(ev4.data.key.keyCode == pwd(4)){
-                  goto override;
+                  goto next;
                 }
+                throw std::runtime_error("Incorrect password");
               }
               throw std::runtime_error("Incorrect password");
             }
@@ -306,9 +308,7 @@ int main() {
     }
     throw std::runtime_error("Incorrect password");
   }  
-
-  override:
-  do_override();
+next:
   std::unique_ptr<Executable> choosen;
   {
     std::forward_list<std::unique_ptr<Executable>> list;
