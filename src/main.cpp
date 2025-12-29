@@ -25,7 +25,7 @@
 #include <sdk/os/lcd.h>
 #include <stdexcept>
 #include <sdk/os/input.h>
-#include <sdk/os/file.h>
+#include <sdk/os/mcs.h>
 
 
 
@@ -92,185 +92,78 @@ void do_override() {
 }
 
 static int pwd(int placement) {
-  int fd = File_Open("\\\\fls0\\passwd.txt", FILE_OPEN_READ);
-  if(fd < 0) {
-    int fdcreate = File_Open("\\\\fls0\\passwd.txt", FILE_OPEN_WRITE | FILE_OPEN_CREATE);
-    if (fdcreate < 0) {
-      return 0;
-    }
-    uint8_t pwd[] = {0,0,0,0};
-    int ret1 = File_Write(fdcreate, pwd, sizeof(pwd));
-    if (ret1 < 0) {
-      File_Close(fdcreate);
-      return 0;
-    }
-    File_Close(fdcreate);
-    ret1 = File_Close(fdcreate);
-    if (ret1 < 0) {
-      return 0;
+  int pwdf = MCS_CreateFolder("Password",0);
+  if(pwdf == MCS_FOLDER_EXISTS or pwdf == MCS_OK) {
+    // Folder already exists or was created successfully
+    int pwdvar = MCS_SetVariable("Password", "Passwd", MCS_VariableType::VARTYPE_STR, sizeof("0000"), nullptr);
+    if(pwdvar != MCS_OK) {
+      return -1;
     }
   }
-  uint8_t read[4];
-  int ret = File_Read(fd, read, sizeof(read));
-  if (ret < 0) {
-    File_Close(fd);
-    return  0;
-  }
+  enum MCS_VariableType type;
+  void* data = nullptr;
+  uint32_t size = 4;
+  if (MCS_GetVariable("Password", "Passwd", &type, nullptr, &data, &size) == MCS_OK) {} else {return -1;}
+  const char* value = static_cast<const char*>(data);
   int key1 = 0;
-  switch(read[0]) {
-    case 0:
-      key1 = KEYCODE_0;
-      break;
-    case 1:
-      key1 = KEYCODE_1;
-      break;
-    case 2: 
-      key1 = KEYCODE_2;
-      break;
-    case 3:
-      key1 = KEYCODE_3;
-      break;
-    case 4:
-      key1 = KEYCODE_4;
-      break;
-    case 5:
-      key1 = KEYCODE_5;
-      break;
-    case 6:
-      key1 = KEYCODE_6;
-      break;
-    case 7:
-      key1 = KEYCODE_7;
-      break;
-    case 8:
-      key1 = KEYCODE_8;
-      break;
-    case 9:
-      key1 = KEYCODE_9;
-      break;
-    default:
-      return 0;
-  }; int key2 = 0;
-  switch(read[1]) {
-    case 0:
-      key2 = KEYCODE_0;
-      break;
-    case 1:
-      key2 = KEYCODE_1;
-      break;
-    case 2: 
-      key2 = KEYCODE_2;
-      break;
-    case 3:
-      key2 = KEYCODE_3;
-      break;
-    case 4:
-      key2 = KEYCODE_4;
-      break;
-    case 5:
-      key2 = KEYCODE_5;
-      break;
-    case 6:
-      key2 = KEYCODE_6;
-      break;
-    case 7:
-      key2 = KEYCODE_7;
-      break;
-    case 8:
-      key2 = KEYCODE_8;
-      break;
-    case 9:
-      key2 = KEYCODE_9;
-      break;
-    default:
-      return 0;
-  }; int key3 = 0;
-  switch(read[2]) {
-    case 0:
-      key3 = KEYCODE_0;
-      break;
-    case 1:
-      key3 = KEYCODE_1;
-      break;
-    case 2: 
-      key3 = KEYCODE_2;
-      break;
-    case 3:
-      key3 = KEYCODE_3;
-      break;
-    case 4:
-      key3 = KEYCODE_4;
-      break;
-    case 5:
-      key3 = KEYCODE_5;
-      break;
-    case 6:
-      key3 = KEYCODE_6;
-      break;
-    case 7:
-      key3 = KEYCODE_7;
-      break;
-    case 8:
-      key3 = KEYCODE_8;
-      break;
-    case 9:
-      key3 = KEYCODE_9;
-      break;
-    default:
-      return 0;
-  }; int key4 = 0;
-  switch(read[3]) {
-    case 0:
-      key4 = KEYCODE_0;
-      break;
-    case 1:
-      key4 = KEYCODE_1;
-      break;
-    case 2: 
-      key4 = KEYCODE_2;
-      break;
-    case 3:
-      key4 = KEYCODE_3;
-      break;
-    case 4:
-      key4 = KEYCODE_4;
-      break;
-    case 5:
-      key4 = KEYCODE_5;
-      break;
-    case 6:
-      key4 = KEYCODE_6;
-      break;
-    case 7:
-      key4 = KEYCODE_7;
-      break;
-    case 8:
-      key4 = KEYCODE_8;
-      break;
-    case 9:
-      key4 = KEYCODE_9;
-      break;
-    default:
-      return 0;
-  }
-
+  int key2 = 0;
+  int key3 = 0;
+  int key4 = 0;
+  switch(value[0]) {
+    case '0': key1 = KEYCODE_0; break;
+    case '1': key1 = KEYCODE_1; break;
+    case '2': key1 = KEYCODE_2; break;
+    case '3': key1 = KEYCODE_3; break;
+    case '4': key1 = KEYCODE_4; break;
+    case '5': key1 = KEYCODE_5; break;
+    case '6': key1 = KEYCODE_6; break;
+    case '7': key1 = KEYCODE_7; break;
+    case '8': key1 = KEYCODE_8; break;
+    case '9': key1 = KEYCODE_9; break;
+    default: return -1;}
+  switch(value[1]) {
+    case '0': key2 = KEYCODE_0; break;
+    case '1': key2 = KEYCODE_1; break;
+    case '2': key2 = KEYCODE_2; break;
+    case '3': key2 = KEYCODE_3; break;
+    case '4': key2 = KEYCODE_4; break;
+    case '5': key2 = KEYCODE_5; break;
+    case '6': key2 = KEYCODE_6; break;
+    case '7': key2 = KEYCODE_7; break;
+    case '8': key2 = KEYCODE_8; break;
+    case '9': key2 = KEYCODE_9; break;
+    default: return -1;}
+  switch(value[2]) {
+    case '0': key3 = KEYCODE_0; break;
+    case '1': key3 = KEYCODE_1; break;
+    case '2': key3 = KEYCODE_2; break;
+    case '3': key3 = KEYCODE_3; break;
+    case '4': key3 = KEYCODE_4; break;
+    case '5': key3 = KEYCODE_5; break;
+    case '6': key3 = KEYCODE_6; break;
+    case '7': key3 = KEYCODE_7; break;
+    case '8': key3 = KEYCODE_8; break;
+    case '9': key3 = KEYCODE_9; break;
+    default: return -1;}
+  switch(value[3]) {
+    case '0': key4 = KEYCODE_0; break;
+    case '1': key4 = KEYCODE_1; break;
+    case '2': key4 = KEYCODE_2; break;
+    case '3': key4 = KEYCODE_3; break;
+    case '4': key4 = KEYCODE_4; break;
+    case '5': key4 = KEYCODE_5; break;
+    case '6': key4 = KEYCODE_6; break;
+    case '7': key4 = KEYCODE_7; break;
+    case '8': key4 = KEYCODE_8; break;
+    case '9': key4 = KEYCODE_9; break;
+    default: return -1;}
   switch(placement) {
-    case 1:
-      return key1;
-      break;
-    case 2:
-      return key2;
-      break;
-    case 3:
-      return key3;
-      break;
-    case 4:
-      return key4;
-      break;
-    default:
-      return 0;
+    case 1: return key1;
+    case 2: return key2;
+    case 3: return key3;
+    case 4: return key4;
+    default: return -1;
   }
-
 }
 
 
@@ -278,7 +171,6 @@ int main() {
   bool firstKeyPressed = false;
   bool secondKeyPressed = false;
   bool thirdKeyPressed = false;
-
   {
       struct Input_Event event;
       while (true) {
