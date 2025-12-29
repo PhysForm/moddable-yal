@@ -116,7 +116,7 @@ static int pwd(int placement) {
     File_Close(fd);
     return  0;
   }
-  int key1 =0;
+  int key1 = 0;
   switch(read[0]) {
     case 0:
       key1 = KEYCODE_0;
@@ -275,40 +275,60 @@ static int pwd(int placement) {
 
 
 int main() {
-  do_override();
-  Input_Event ev1;
-  GetInput(&ev1, 0xFFFFFFFF, 0x10);
-  if(ev1.type == EVENT_KEY && ev1.data.key.direction == KEY_PRESSED) {
-    if(ev1.data.key.keyCode == pwd(1)){
-      Input_Event ev2;
-      GetInput(&ev2, 0xFFFFFFFF, 0x10);
-      if(ev2.type == EVENT_KEY && ev2.data.key.direction == KEY_PRESSED) {
-        if(ev2.data.key.keyCode == pwd(2)){
-          Input_Event ev3;
-          GetInput(&ev3, 0xFFFFFFFF, 0x10);
-          if(ev3.type == EVENT_KEY && ev3.data.key.direction == KEY_PRESSED) {
-            if(ev3.data.key.keyCode == pwd(3)){
-              Input_Event ev4;
-              GetInput(&ev4, 0xFFFFFFFF, 0x10);
-              if(ev4.type == EVENT_KEY && ev4.data.key.direction == KEY_PRESSED) {
-                if(ev4.data.key.keyCode == pwd(4)){
-                  goto next;
-                }
-                throw std::runtime_error("Incorrect password");
+  bool firstKeyPressed = false;
+  bool secondKeyPressed = false;
+  bool thirdKeyPressed = false;
+
+  {
+      struct Input_Event event;
+      while (true) {
+          GetInput(&event, 0xFFFFFFFF, 0x10);
+
+          if (event.type == EVENT_KEY && event.data.key.direction == KEY_PRESSED) {
+
+              if (!firstKeyPressed) {
+                  if (event.data.key.keyCode == pwd(1)) {
+                      firstKeyPressed = true;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
               }
-              throw std::runtime_error("Incorrect password");
-            }
-            throw std::runtime_error("Incorrect password");
+
+              else if (!secondKeyPressed) {
+                  if (event.data.key.keyCode == pwd(2)) {
+                      secondKeyPressed = true;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
+
+              else if (!thirdKeyPressed) {
+                  if (event.data.key.keyCode == pwd(3)) {
+                      thirdKeyPressed = true;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
+
+              else {
+                  if (event.data.key.keyCode == pwd(4)) {
+                      break;
+                  } else {
+                      firstKeyPressed = false;
+                      secondKeyPressed = false;
+                      thirdKeyPressed = false;
+                  }
+              }
           }
-          throw std::runtime_error("Incorrect password");
-        }
-        throw std::runtime_error("Incorrect password");
       }
-      throw std::runtime_error("Incorrect password");
-    }
-    throw std::runtime_error("Incorrect password");
-  }  
-next:
+  }
+ 
   std::unique_ptr<Executable> choosen;
   {
     std::forward_list<std::unique_ptr<Executable>> list;
